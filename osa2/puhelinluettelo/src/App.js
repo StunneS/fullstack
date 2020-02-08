@@ -19,7 +19,7 @@ const App = () => {
 
   const addPerson = (event) => {
     event.preventDefault()
-      let val = persons.find(person => person.name === newName)
+      let val = persons.find(person => person.name.toLowerCase() === newName.toLowerCase())
       const personObj = { name: newName, number: newNmbr}
       if(val != null) {
           if(window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
@@ -27,6 +27,8 @@ const App = () => {
                 .update(val.id, personObj)
                 .then(response => {
                     setPersons(persons.map(person => person.id !== val.id ? person : response))
+                    setNewName('')
+                    setNewNmbr('')
                     setSuccess(
                         `${personObj.name}'s number changed.`
                     )
@@ -56,6 +58,11 @@ const App = () => {
                 setTimeout(() => {
                     setSuccess('')
                 },4000)
+            }).catch(error =>{
+                setError('Varmistathan että annettu nimi on yli 2 merkkiä pitkä, ja että numero on yli 7 merkkiä pitkä')
+                setTimeout(() => {
+                    setError('')
+                }, 4000)
             })
       }
   }
