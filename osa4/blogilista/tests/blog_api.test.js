@@ -1,0 +1,140 @@
+const mongoose = require('mongoose')
+const supertest = require('supertest')
+const app = require('../app')
+const api = supertest(app)
+const Blog = require('../models/blog')
+const User = require('../models/user')
+
+const blogs = [
+    { _id: "5a422a851b54a676234d17f7", title: "React patterns", author: "Michael Chan", url: "https://reactpatterns.com/", likes: 7, __v: 0 },
+    { _id: "5a422aa71b54a676234d17f8", title: "Go To Statement Considered Harmful", author: "Edsger W. Dijkstra", url: "http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html", likes: 5, __v: 0 },
+    { _id: "5a422b3a1b54a676234d17f9", title: "Canonical string reduction", author: "Edsger W. Dijkstra", url: "http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html", likes: 12, __v: 0 },
+    { _id: "5a422b891b54a676234d17fa", title: "First class tests", author: "Robert C. Martin", url: "http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.htmll", likes: 10, __v: 0 },
+    { _id: "5a422ba71b54a676234d17fb", title: "TDD harms architecture", author: "Robert C. Martin", url: "http://blog.cleancoder.com/uncle-bob/2017/03/03/TDD-Harms-Architecture.html", likes: 0, __v: 0 },
+    { _id: "5a422bc61b54a676234d17fc", title: "Type wars", author: "Robert C. Martin", url: "http://blog.cleancoder.com/uncle-bob/2016/05/01/TypeWars.html", likes: 2, __v: 0 }
+   ] 
+beforeEach(async () => {
+    await Blog.deleteMany({})
+    await User.deleteMany({})
+
+    let userObject = new User ({
+        username: 'tester',
+        name: 'tester',
+        password: 'tester'
+    })
+    const thi = await userObject.save()
+
+    for(let i = 0; i< 6; i++) {
+        let blogObject = new Blog(blogs[i])
+        const res = await blogObject.save()
+    }
+})
+
+test('blogs are json and correct ammount', async () => {
+    const response = await api
+        .get('/api/blogs/')
+        .expect(200)
+        .expect('Content-Type', /application\/json/)
+    expect(response.body.length).toBe(blogs.length)
+})
+
+test('blogs id is correctly returned', async () => {
+    const response = await api
+        .get('/api/blogs/')
+        .expect(200)
+    expect(response.body[0].id).toBeDefined()
+})
+test('adding a blog works', async () => {
+
+    let userObject = new User ({
+        username: 'testerblog',
+        name: 'testerblog',
+        password: 'testerblog'
+    })
+    const moo = await userObject.save()
+    /*await api
+        .post('/api/login/')
+        .send({
+            username: 'tester',
+            password: 'tester'
+        })
+        .expect(200)
+    console.log(res) */
+    const newBlog = ({
+        title: 'Test',
+        author: 'Me',
+        url: 'none',
+        likes: 10
+    })
+    const bo = await api
+        .post('/api/blogs/')
+        .send(newBlog)
+        .expect(201)
+        .expect('Content-Type', /application\/json/)
+
+    console.log(bo)
+    const response = await api.get('/api/blogs/')
+    const titles = response.body.map(blog => blog.title)
+
+    expect(response.body.length).toBe(blogs.length +1)
+    expect(titles).toContain('Test')
+})
+
+test('adding a blog with no likes works', async () => {
+    const newBlog = {
+        title: 'No',
+        author: 'Likes',
+        url: 'Adds 0'
+    }
+    await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(201)
+        .expect('Content-Type', /application\/json/)
+
+    const response = await api.get('/api/blogs/')
+
+    expect(response.body.length).toBe(blogs.length +1)
+    expect(response.body[blogs.length].likes).toBe(0)
+})
+test('adding a blog with no info errors', async () => {
+    const newBlog = {
+        author: 'No info',
+        likes: 99
+    }
+    await api
+        .post('/api/blogs/')
+        .send(newBlog)
+        .expect(400)
+
+    const response = await api.get('/api/blogs')
+    expect(response.body.length).toBe(blogs.length)
+})
+test('deleting one by id works', async () => {
+    await api
+        .delete(`/api/blogs/${blogs[0]._id}`)
+        .expect(204)
+    const response = await api.get('/api/blogs')
+    const titles = response.body.map(r => r.title)
+    expect(response.body.length).toBe(blogs.length-1)
+    expect(titles).not.toContain('React patterns')
+
+})
+test('updating one blog', async () => {
+    const newBlog = {
+        title: "React patterns",
+        author: "Michael Chan",
+        url: "https://reactpatterns.com/",
+        likes: 18
+    }
+    const updated = await api
+        .put(`/api/blogs/${blogs[0]._id}`)
+        .send(newBlog)
+    expect(updated.body.likes).toBe(18)
+    
+    const response = await api.get('/api/blogs')
+    expect(response.body.length).toBe(blogs.length)
+})
+afterAll(() => {
+    mongoose.connection.close()
+})
