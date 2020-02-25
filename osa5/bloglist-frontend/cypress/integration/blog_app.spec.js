@@ -94,16 +94,22 @@ describe('Blog app', function() {
       cy.contains('view').click()
 
       cy.contains('tested').contains('like').click()
+      cy.contains('tested').contains('1')
       cy.contains('getLiked').contains('like').click()
+      cy.contains('getLiked').contains('1')
       cy.contains('getLiked').contains('like').click()
+      cy.contains('getLiked').contains('2')
       cy.contains('booms').contains('like').click()
+      cy.contains('booms').contains('1')
       cy.contains('booms').contains('like').click()
+      cy.contains('booms').contains('2')
       cy.contains('booms').contains('like').click()
       cy.contains('booms').contains('3')
 
       cy.get('#bloglist').get('.blog:first').contains('Ka Boom')
 
       cy.contains('getLiked').contains('like').click()
+      cy.contains('getLiked').contains('3')
       cy.contains('getLiked').contains('like').click()
       cy.contains('getLiked').contains('4')
 
