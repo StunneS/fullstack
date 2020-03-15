@@ -1,5 +1,8 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
+import {
+  Link,
+} from 'react-router-dom'
 
 const Blog = ({ blog, addLike, deleteBlog, loggedInUser }) => {
   const [show, setShow] = useState(false)
@@ -22,7 +25,7 @@ const Blog = ({ blog, addLike, deleteBlog, loggedInUser }) => {
   if(show) {
     return(
       <div style={blogStyle} className='blog'>
-        {blog.title}, {blog.author} <button onClick={toggle}>hide</button><br/>
+        <Link to={`/blogs/${blog.id}`}>{blog.title}, {blog.author} </Link> <button onClick={toggle}>hide</button><br/>
         {blog.url} <br/>
         likes {blog.likes} <button onClick={addLike} >like</button> <br/>
         {blog.user.name} <br/>
@@ -32,7 +35,7 @@ const Blog = ({ blog, addLike, deleteBlog, loggedInUser }) => {
   }
   return(
     <div style={blogStyle}>
-      {blog.title}, {blog.author}
+      <Link to={`/blogs/${blog.id}`}>{blog.title}, {blog.author} </Link>
       <button onClick={toggle}>view</button>
     </div>
   )

@@ -1,0 +1,36 @@
+{
+  "notes": [
+    {
+      "content": "custom-hookit aivan mahtavia",
+      "id": 1
+    },
+    {
+      "content": "paras feature ikinä <3",
+      "id": 2
+    },
+    {
+      "content": "new note adding yei",
+      "id": 3
+    },
+    {
+      "content": "new try",
+      "id": 4
+    },
+    {
+      "content": "this works!",
+      "id": 5
+    }
+  ],
+  "persons": [
+    {
+      "name": "mluukkai",
+      "number": "040-5483923",
+      "id": 1
+    },
+    {
+      "name": "Testi",
+      "number": "666-6666",
+      "id": 2
+    }
+  ]
+}
